@@ -1,9 +1,8 @@
 module.exports = {
-  pathPrefix: `/gatsby-theme-journal`,
   siteMetadata: {
     siteUrl: `https://ahacad.github.io`,
     siteName: "Ahacad",
-    sign: "computer assisted design",
+    sign: "",
   },
   plugins: [
     {
