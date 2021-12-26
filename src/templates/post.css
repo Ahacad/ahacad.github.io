@@ -52,12 +52,12 @@ h6 {
 }
 
 .markdown a {
-  color: rgb(29 78 216);
+  border-bottom-width: 6px;
+  transition-duration: 150ms;
+  border-color: rgb(219 234 254);
 }
 .markdown a:hover {
-  color: rgb(59 130 246);
-  text-decoration-line: underline;
-  text-underline-offset: 4px;
+    background-color: rgb(219 234 254);
 }
 
 .markdown ul {
@@ -75,6 +75,7 @@ h6 {
   padding: 8px 20px;
   background-color: rgb(249 250 251);
   color: rgb(29 78 216);
+  margin: 1rem 0;
 }
 
 .markdown .contains-task-list li {
@@ -102,4 +103,19 @@ h6 {
   padding: 8px 14px;
   border: 1px solid;
   border-color: rgb(209 213 219);
+}
+.markdown code {
+    font-size: 0.875rem;
+    background-color: #edf0f2;
+    border-radius: 3px;
+    padding: 0.25rem 0.5rem;
+    border-color: rgb(209 213 219);
+}
+.markdown pre {
+    margin: 1rem 0;
+    font-size: 0.875rem;
+    background-color: #edf0f2;
+    border-radius: 3px;
+    padding: 0.25rem 0.5rem;
+    border-color: rgb(209 213 219);
 }
