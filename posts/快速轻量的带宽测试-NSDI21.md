@@ -3,8 +3,10 @@ title: 快速轻量的带宽测量·NSDI '21
 date: 2021-12-25
 description:
 author: ahacad
-cover: ""
+cover: https://unsplash.com/photos/PAOv9-7VBMI
 published: false
+tags: ["读读论文"]
+type: post
 ---
 
 本文要介绍的是 NSDI 2021 的会议论文 —— [Fast and Light Bandwidth Testing for Internet Users](https://www.usenix.org/conference/nsdi21/presentation/yang-xinlei)，该论文实现了一个新的带宽测量系统，包括服务端和用户段，比起传统的测量方法能够节省大量的流量和带宽。
