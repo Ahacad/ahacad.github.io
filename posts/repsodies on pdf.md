@@ -1,6 +1,6 @@
 ---
 title: reposodies on pdf
-date: 2022--1-02
+date: 2022-01-02
 description:
 cover: ""
 published: false
