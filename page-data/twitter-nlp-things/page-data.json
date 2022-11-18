@@ -1,0 +1,5 @@
+{
+    "componentChunkName": "component---src-templates-post-js",
+    "path": "/twitter-nlp-things/",
+    "result": {"data":{"markdownRemark":{"html":"<p>最近做事情和 Twitter &#x26; NLP 密切相关，写点综述供自己参考。</p>","excerpt":"最近做事情和 Twitter & NLP 密切相关，写点综述供自己参考。","frontmatter":{"date":"2022-11-18 12:00:00","title":"Twitter NLP Things","description":"","cover":null}}},"pageContext":{"slug":"/twitter-nlp-things/"}},
+    "staticQueryHashes": ["2237532263"]}
