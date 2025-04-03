@@ -1,0 +1,110 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { ArticleCard } from '../components/ArticleCard';
+import { getAllArticles, getAllProjects } from '../utils/content';
+
+// Get recent content
+const articles = await getAllArticles();
+const recentArticles = articles.slice(0, 3);
+
+const projects = await getAllProjects();
+const recentProjects = projects.slice(0, 3);
+---
+
+<MainLayout title="Ahacad | Personal Blog">
+  <section class="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-16">
+    <div class="container mx-auto px-4 flex max-w-[64rem] flex-col items-center gap-4 text-center">
+      <h1 class="text-4xl font-bold sm:text-5xl md:text-6xl lg:text-7xl">
+        Ahacad
+      </h1>
+      <p class="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
+        Welcome to my personal blog. I write about technology, programming, and other interesting topics.
+      </p>
+      <div class="space-x-4">
+        <a
+          href="/articles"
+          class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
+        >
+          Read Articles
+        </a>
+        <a
+          href="/projects"
+          class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+        >
+          View Projects
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <section class="container mx-auto px-4 space-y-6 py-8 md:py-12 lg:py-16">
+    <div class="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
+      <h2 class="text-3xl font-bold leading-[1.1] sm:text-3xl md:text-5xl">
+        Recent Articles
+      </h2>
+      <p class="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
+        Check out my latest writing.
+      </p>
+    </div>
+    
+    <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      {recentArticles.map((article) => (
+        <ArticleCard
+          title={article.frontmatter.title}
+          description={article.frontmatter.description}
+          date={article.frontmatter.date}
+          tags={article.frontmatter.tags}
+          slug={article.slug}
+        />
+      ))}
+    </div>
+    
+    <div class="flex justify-center">
+      <a
+        href="/articles"
+        class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+      >
+        View All Articles
+      </a>
+    </div>
+  </section>
+  
+  <section class="container mx-auto px-4 space-y-6 py-8 md:py-12 lg:py-16">
+    <div class="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
+      <h2 class="text-3xl font-bold leading-[1.1] sm:text-3xl md:text-5xl">
+        Featured Projects
+      </h2>
+      <p class="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
+        Some of my recent work and experiments.
+      </p>
+    </div>
+    
+    <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      {recentProjects.map((project) => (
+        <div class="group relative overflow-hidden rounded-lg border bg-background p-6 shadow-sm transition-shadow hover:shadow-md">
+          <h3 class="text-xl font-bold">{project.frontmatter.title}</h3>
+          <p class="mt-2 text-muted-foreground">{project.frontmatter.description}</p>
+          <div class="mt-4 flex flex-wrap gap-2">
+            {project.frontmatter.tags.map((tag: string) => (
+              <span class="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-md">
+                {tag}
+              </span>
+            ))}
+          </div>
+          <a href={`/projects/${project.slug}`} class="absolute inset-0">
+            <span class="sr-only">View {project.frontmatter.title}</span>
+          </a>
+        </div>
+      ))}
+    </div>
+    
+    <div class="flex justify-center">
+      <a
+        href="/projects"
+        class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+      >
+        View All Projects
+      </a>
+    </div>
+  </section>
+</MainLayout>
