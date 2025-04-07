@@ -1,0 +1,40 @@
+---
+// src/pages/prompts.astro
+import { getCollection } from 'astro:content';
+import MainLayout from '../layouts/MainLayout.astro';
+import PromptCard from '../components/PromptCard.astro';
+
+// 1. Fetch all prompts, sorted by optional date or title
+const allPrompts = await getCollection('prompts', ({ data }) => {
+  return !data.draft; // Filter out drafts if you add that field later
+});
+// Sort prompts, newest first if date exists, otherwise by title
+allPrompts.sort((a, b) => {
+    if (a.data.pubDate && b.data.pubDate) {
+        return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+    }
+    return a.data.title.localeCompare(b.data.title);
+});
+
+
+const pageTitle: string = "My Prompts";
+const pageDescription: string = "A collection of useful prompts for various roles and tasks.";
+---
+<MainLayout title={pageTitle} description={pageDescription}>
+  <section class="py-8 md:py-12">
+    <div class="container mx-auto px-4">
+      <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center text-slate-900 dark:text-slate-100">{pageTitle}</h1>
+      <p class="mb-10 text-lg text-center text-slate-600 dark:text-slate-400">{pageDescription}</p>
+
+      {allPrompts.length === 0 ? (
+        <p class="text-center text-slate-500 dark:text-slate-400">No prompts found yet. Add some in <code>src/content/prompts/</code>!</p>
+      ) : (
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {allPrompts.map(prompt => (
+            <PromptCard prompt={prompt} />
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</MainLayout>

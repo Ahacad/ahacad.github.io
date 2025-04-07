@@ -1,0 +1,30 @@
+---
+// src/components/PromptCard.astro
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+	prompt: CollectionEntry<'prompts'>;
+}
+
+const { prompt } = Astro.props;
+const { Content } = await prompt.render(); // Get the rendered Markdown content for the prompt body
+---
+<div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden transition-shadow duration-300 hover:shadow-lg border border-slate-200 dark:border-slate-700">
+  <div class="p-6">
+    <h3 class="text-xl font-semibold mb-2 text-slate-800 dark:text-slate-100">{prompt.data.title}</h3>
+    <p class="text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-3 uppercase tracking-wide">Role: {prompt.data.role}</p>
+    <div class="prose prose-sm dark:prose-invert max-w-none text-slate-600 dark:text-slate-300">
+      <Content /> {/* Render the main prompt content from the Markdown file */}
+    </div>
+    {prompt.data.tags && prompt.data.tags.length > 0 && (
+      <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+        <p class="text-xs text-slate-500 dark:text-slate-400">Tags:
+          {prompt.data.tags.map(tag => (
+            // In a real app, you might link these tags: <a href={`/tags/${tag}`} class="ml-1 bg-slate-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 px-2 py-0.5 rounded text-xs hover:bg-slate-200 dark:hover:bg-slate-600">{tag}</a>
+            <span class="ml-1 bg-slate-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 px-2 py-0.5 rounded">{tag}</span>
+          ))}
+        </p>
+      </div>
+    )}
+  </div>
+</div>
