@@ -1,9 +1,8 @@
 ---
 title: "Getting Started with Astro: Building Modern Websites"
-date: "2025-04-01"
+pubDate: "2025-04-01"
 tags: ["astro", "web-development", "javascript", "tutorial"]
 description: "Learn how to build fast, content-focused websites with Astro, the new static site generator that lets you use your favorite UI components."
-published: true
 ---
 
 # Getting Started with Astro: Building Modern Websites
