@@ -1,10 +1,9 @@
 ---
 title: "Personal Blog & Portfolio"
-date: "2025-04-01"
+pubDate: "2025-04-01"
 tags: ["astro", "react", "typescript", "tailwind"]
 description: "A personal blog and portfolio website built with Astro, React, and Tailwind CSS."
 link: "https://github.com/ahacad/ahacad.github.io"
-published: true
 ---
 
 # Personal Blog & Portfolio
