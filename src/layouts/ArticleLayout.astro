@@ -1,0 +1,50 @@
+---
+import MainLayout from './MainLayout.astro';
+import { formatDate } from '../utils/date';
+
+const { frontmatter, slug } = Astro.props;
+const { title, date, tags, description } = frontmatter;
+---
+
+<MainLayout title={`${title} | Ahacad's Blog`} description={description}>
+  <article class="mx-auto max-w-3xl px-4">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
+        {title}
+      </h1>
+      <div class="mt-4 flex items-center space-x-2 text-muted-foreground">
+        <time datetime={date}>{formatDate(date)}</time>
+        <span>•</span>
+        <div class="flex flex-wrap gap-2">
+          {tags.map((tag: string) => (
+            <a 
+              href={`/tags/${tag}`} 
+              class="text-sm bg-secondary text-secondary-foreground hover:bg-secondary/80 px-2 py-1 rounded-md no-underline"
+            >
+              {tag}
+            </a>
+          ))}
+        </div>
+      </div>
+    </header>
+    
+    <div class="prose prose-lg dark:prose-invert max-w-none">
+      <slot />
+    </div>
+  </article>
+</MainLayout>
+
+<style>
+  /* Additional article-specific styles */
+  :global(.prose pre) {
+    @apply bg-muted text-foreground p-4 rounded-md overflow-x-auto;
+  }
+  
+  :global(.prose code) {
+    @apply font-mono text-sm;
+  }
+  
+  :global(.prose a) {
+    @apply text-primary underline-offset-4 no-underline hover:underline;
+  }
+</style>

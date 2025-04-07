@@ -1,0 +1,144 @@
+---
+import { getAllArticles } from '../../utils/content';
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import { addSyntaxHighlighting } from '../../utils/highlight';
+
+export async function getStaticPaths() {
+  const articles = await getAllArticles();
+  
+  return articles.map(article => ({
+    params: { slug: article.slug },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+const { frontmatter, content, slug } = article;
+
+// HTML escape function for code blocks
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Simple markdown-to-HTML conversion function
+function simpleMarkdownToHtml(markdown) {
+  // Split the content by lines to process it easier
+  const lines = markdown.split('\n');
+  let html = '';
+  let inCodeBlock = false;
+  let codeBlockLanguage = '';
+  let codeBlockContent = '';
+  let inList = false;
+  let listType = '';
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    // Handle code blocks
+    if (line.startsWith('```')) {
+      if (!inCodeBlock) {
+        // Start of code block
+        inCodeBlock = true;
+        codeBlockLanguage = line.slice(3).trim();
+        codeBlockContent = '';
+      } else {
+        // End of code block
+        inCodeBlock = false;
+        html += `<pre><code class="language-${codeBlockLanguage}">${escapeHtml(codeBlockContent)}</code></pre>`;
+      }
+      continue;
+    }
+    
+    if (inCodeBlock) {
+      codeBlockContent += line + '\n';
+      continue;
+    }
+    
+    // Handle headings
+    if (line.startsWith('# ')) {
+      html += `<h1>${line.slice(2)}</h1>`;
+    } else if (line.startsWith('## ')) {
+      html += `<h2>${line.slice(3)}</h2>`;
+    } else if (line.startsWith('### ')) {
+      html += `<h3>${line.slice(4)}</h3>`;
+    } else if (line.startsWith('#### ')) {
+      html += `<h4>${line.slice(5)}</h4>`;
+    } else if (line.startsWith('##### ')) {
+      html += `<h5>${line.slice(6)}</h5>`;
+    } else if (line.startsWith('###### ')) {
+      html += `<h6>${line.slice(7)}</h6>`;
+    }
+    // Handle lists
+    else if (line.startsWith('- ') || line.startsWith('* ')) {
+      if (!inList || listType !== 'ul') {
+        if (inList) html += `</${listType}>`;
+        html += '<ul>';
+        inList = true;
+        listType = 'ul';
+      }
+      html += `<li>${line.slice(2)}</li>`;
+    }
+    else if (/^\d+\.\s/.test(line)) {
+      if (!inList || listType !== 'ol') {
+        if (inList) html += `</${listType}>`;
+        html += '<ol>';
+        inList = true;
+        listType = 'ol';
+      }
+      html += `<li>${line.replace(/^\d+\.\s/, '')}</li>`;
+    }
+    // Close list if next line is not a list item
+    else if (inList && i < lines.length - 1 && 
+      !lines[i+1].startsWith('- ') && 
+      !lines[i+1].startsWith('* ') && 
+      !/^\d+\.\s/.test(lines[i+1])) {
+      html += `</${listType}>`;
+      inList = false;
+    }
+    // Handle empty lines
+    else if (line.trim() === '') {
+      if (inList) {
+        html += `</${listType}>`;
+        inList = false;
+      }
+      html += '\n';
+    }
+    // Default to paragraph
+    else {
+      // Process inline formatting
+      const processedLine = line
+        // Bold
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        // Inline code
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        // Links
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+        // Images
+        .replace(/!\[([^\]]+)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
+      
+      html += `<p>${processedLine}</p>`;
+    }
+  }
+  
+  // Close any open lists
+  if (inList) {
+    html += `</${listType}>`;
+  }
+  
+  return html;
+}
+
+const contentHtml = simpleMarkdownToHtml(content);
+const enhancedHtml = addSyntaxHighlighting(contentHtml);
+---
+
+<ArticleLayout frontmatter={frontmatter} slug={slug}>
+  <div class="markdown-content" set:html={enhancedHtml} />
+</ArticleLayout>

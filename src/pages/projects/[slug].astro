@@ -1,0 +1,183 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getAllProjects } from '../../utils/content';
+import { formatDate } from '../../utils/date';
+import { addSyntaxHighlighting } from '../../utils/highlight';
+
+export async function getStaticPaths() {
+  const projects = await getAllProjects();
+  
+  return projects.map(project => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { frontmatter, content, slug } = project;
+
+// HTML escape function for code blocks
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Simple markdown-to-HTML conversion function
+function simpleMarkdownToHtml(markdown) {
+  // Split the content by lines to process it easier
+  const lines = markdown.split('\n');
+  let html = '';
+  let inCodeBlock = false;
+  let codeBlockLanguage = '';
+  let codeBlockContent = '';
+  let inList = false;
+  let listType = '';
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    // Handle code blocks
+    if (line.startsWith('```')) {
+      if (!inCodeBlock) {
+        // Start of code block
+        inCodeBlock = true;
+        codeBlockLanguage = line.slice(3).trim();
+        codeBlockContent = '';
+      } else {
+        // End of code block
+        inCodeBlock = false;
+        html += `<pre><code class="language-${codeBlockLanguage}">${escapeHtml(codeBlockContent)}</code></pre>`;
+      }
+      continue;
+    }
+    
+    if (inCodeBlock) {
+      codeBlockContent += line + '\n';
+      continue;
+    }
+    
+    // Handle headings
+    if (line.startsWith('# ')) {
+      html += `<h1>${line.slice(2)}</h1>`;
+    } else if (line.startsWith('## ')) {
+      html += `<h2>${line.slice(3)}</h2>`;
+    } else if (line.startsWith('### ')) {
+      html += `<h3>${line.slice(4)}</h3>`;
+    } else if (line.startsWith('#### ')) {
+      html += `<h4>${line.slice(5)}</h4>`;
+    } else if (line.startsWith('##### ')) {
+      html += `<h5>${line.slice(6)}</h5>`;
+    } else if (line.startsWith('###### ')) {
+      html += `<h6>${line.slice(7)}</h6>`;
+    }
+    // Handle lists
+    else if (line.startsWith('- ') || line.startsWith('* ')) {
+      if (!inList || listType !== 'ul') {
+        if (inList) html += `</${listType}>`;
+        html += '<ul>';
+        inList = true;
+        listType = 'ul';
+      }
+      html += `<li>${line.slice(2)}</li>`;
+    }
+    else if (/^\d+\.\s/.test(line)) {
+      if (!inList || listType !== 'ol') {
+        if (inList) html += `</${listType}>`;
+        html += '<ol>';
+        inList = true;
+        listType = 'ol';
+      }
+      html += `<li>${line.replace(/^\d+\.\s/, '')}</li>`;
+    }
+    // Close list if next line is not a list item
+    else if (inList && i < lines.length - 1 && 
+      !lines[i+1].startsWith('- ') && 
+      !lines[i+1].startsWith('* ') && 
+      !/^\d+\.\s/.test(lines[i+1])) {
+      html += `</${listType}>`;
+      inList = false;
+    }
+    // Handle empty lines
+    else if (line.trim() === '') {
+      if (inList) {
+        html += `</${listType}>`;
+        inList = false;
+      }
+      html += '\n';
+    }
+    // Default to paragraph
+    else {
+      // Process inline formatting
+      const processedLine = line
+        // Bold
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        // Inline code
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        // Links
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+        // Images
+        .replace(/!\[([^\]]+)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
+      
+      html += `<p>${processedLine}</p>`;
+    }
+  }
+  
+  // Close any open lists
+  if (inList) {
+    html += `</${listType}>`;
+  }
+  
+  return html;
+}
+
+const contentHtml = simpleMarkdownToHtml(content);
+const enhancedHtml = addSyntaxHighlighting(contentHtml);
+---
+
+<MainLayout title={`${frontmatter.title} | Projects | Ahacad`} description={frontmatter.description}>
+  <article class="container mx-auto px-4 max-w-3xl py-6">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
+        {frontmatter.title}
+      </h1>
+      
+      <div class="mt-4 flex items-center text-muted-foreground">
+        <time datetime={frontmatter.date}>{formatDate(frontmatter.date)}</time>
+      </div>
+      
+      <div class="mt-4 flex flex-wrap gap-2">
+        {frontmatter.tags.map((tag: string) => (
+          <a 
+            href={`/tags/${tag}?type=project`} 
+            class="text-sm bg-secondary text-secondary-foreground hover:bg-secondary/80 px-2 py-1 rounded-md no-underline"
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
+      
+      {frontmatter.link && (
+        <div class="mt-4">
+          <a 
+            href={frontmatter.link} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
+          >
+            Visit Project
+          </a>
+        </div>
+      )}
+    </header>
+    
+    <div class="prose prose-lg dark:prose-invert max-w-none">
+      <div class="markdown-content" set:html={enhancedHtml} />
+    </div>
+  </article>
+</MainLayout>
