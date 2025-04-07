@@ -13,7 +13,6 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
   ],
-  // Enable SSR for dynamic routes
   output: 'static',
   // Add support for dynamic routes
   trailingSlash: 'never',
