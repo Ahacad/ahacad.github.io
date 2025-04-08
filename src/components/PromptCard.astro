@@ -1,75 +1,58 @@
 ---
 // src/components/PromptCard.astro
 import type { CollectionEntry } from 'astro:content';
+import PromptModal from './PromptModal.astro';
+import { PromptIcon } from './PromptIcon';
 
 interface Props {
 	prompt: CollectionEntry<'prompts'>;
 }
 
 const { prompt } = Astro.props;
-const { Content } = await prompt.render(); // Get the rendered Markdown content for the prompt body
 
-// Define icon based on role or tags (you can expand this mapping)
+// Define icon based on role or tags
 function getIconForPrompt(prompt) {
   const role = prompt.data.role.toLowerCase();
   const tags = prompt.data.tags ? prompt.data.tags.map(t => t.toLowerCase()) : [];
   
   if (role.includes('developer') || tags.includes('code') || tags.includes('coding') || tags.includes('programming')) {
-    return { name: 'code', label: 'Code' };
+    return { name: 'Code', label: 'Code' };
   } else if (role.includes('writer') || tags.includes('writing') || tags.includes('creative')) {
-    return { name: 'pencil', label: 'Writing' };
+    return { name: 'PenLine', label: 'Writing' };
   } else if (role.includes('data') || tags.includes('data') || tags.includes('analysis')) {
-    return { name: 'bar-chart', label: 'Data' };
+    return { name: 'BarChart', label: 'Data' };
   } else if (role.includes('researcher') || tags.includes('research')) {
-    return { name: 'search', label: 'Research' };
+    return { name: 'Search', label: 'Research' };
   } else if (role.includes('teacher') || tags.includes('education')) {
-    return { name: 'book-open', label: 'Education' };
+    return { name: 'BookOpen', label: 'Education' };
   } else if (role.includes('business') || tags.includes('business')) {
-    return { name: 'briefcase', label: 'Business' };
+    return { name: 'Briefcase', label: 'Business' };
   } else if (role.includes('assistant') || tags.includes('assistant')) {
-    return { name: 'help-circle', label: 'Assistant' };
+    return { name: 'HelpCircle', label: 'Assistant' };
   } else {
-    return { name: 'message-square', label: 'Prompt' };
+    return { name: 'MessageSquare', label: 'Prompt' };
   }
 }
 
 const promptIcon = getIconForPrompt(prompt);
 const promptId = `prompt-${prompt.slug}`;
+const modalId = `modal-${prompt.slug}`;
 const copyBtnId = `copy-${prompt.slug}`;
-const toggleId = `toggle-${prompt.slug}`;
+
+// Get the first 150 characters of the prompt for preview
+const previewLength = 150;
+const promptText = prompt.body;
+const promptPreview = promptText.length > previewLength 
+  ? promptText.substring(0, previewLength) + '...' 
+  : promptText;
 ---
 
-<div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg border border-slate-200 dark:border-slate-700 relative group">
+<div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg border border-slate-200 dark:border-slate-700 relative group cursor-pointer prompt-card" data-modal-id={modalId}>
   <!-- Card Header -->
-  <div class="p-6 pb-3 flex justify-between items-start border-b border-slate-100 dark:border-slate-700">
+  <div class="p-5 flex justify-between items-start">
     <div class="flex items-center gap-3">
       <div class="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 p-2 rounded-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
-          {promptIcon.name === 'code' && (
-            <path d="m10 20-4-4 4-4"></path><path d="m14 20 4-4-4-4"></path>
-          )}
-          {promptIcon.name === 'pencil' && (
-            <line x1="18" y1="2" x2="22" y2="6"></line><path d="M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z"></path>
-          )}
-          {promptIcon.name === 'bar-chart' && (
-            <line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line>
-          )}
-          {promptIcon.name === 'search' && (
-            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          )}
-          {promptIcon.name === 'book-open' && (
-            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-          )}
-          {promptIcon.name === 'briefcase' && (
-            <rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-          )}
-          {promptIcon.name === 'help-circle' && (
-            <circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
-          )}
-          {promptIcon.name === 'message-square' && (
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          )}
-        </svg>
+        <PromptIcon iconName={promptIcon.name} />
       </div>
       <div>
         <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">{prompt.data.title}</h3>
@@ -78,45 +61,39 @@ const toggleId = `toggle-${prompt.slug}`;
     </div>
     
     <!-- Copy Button -->
-    <button id={copyBtnId} class="copy-btn bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 p-2 rounded-lg transition-colors">
+    <button id={copyBtnId} class="copy-btn bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 p-2 rounded-lg transition-colors z-10">
       <span class="sr-only">Copy prompt</span>
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
       </svg>
     </button>
   </div>
   
   <!-- Card Content -->
-  <div class="p-6">
-    <!-- Preview of prompt content with expand/collapse functionality -->
+  <div class="px-5 pb-5">
+    <!-- Preview of prompt content -->
     <div id={promptId} class="prose prose-sm dark:prose-invert max-w-none text-slate-600 dark:text-slate-300">
       <div class="prompt-preview line-clamp-3">
-        <Content />
-      </div>
-      <div class="prompt-full hidden">
-        <Content />
+        {promptPreview}
       </div>
     </div>
     
-    <!-- Expand/Collapse Button -->
-    <button id={toggleId} class="mt-4 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center">
-      <span class="expand-text">Show full prompt</span>
-      <span class="collapse-text hidden">Show less</span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 ml-1 expand-icon">
+    <!-- View Full Prompt Button -->
+    <button class="view-prompt-btn mt-4 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center">
+      <span>View full prompt</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 ml-1">
         <polyline points="6 9 12 15 18 9"></polyline>
-      </svg>
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 ml-1 collapse-icon hidden">
-        <polyline points="18 15 12 9 6 15"></polyline>
       </svg>
     </button>
   </div>
   
   <!-- Card Footer -->
   {prompt.data.tags && prompt.data.tags.length > 0 && (
-    <div class="px-6 pb-6 pt-2">
+    <div class="px-5 pb-5">
       <div class="flex flex-wrap gap-2">
         {prompt.data.tags.map(tag => (
-          <span class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2 py-1 rounded">
+          <span class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2 py-1 rounded-full">
             #{tag}
           </span>
         ))}
@@ -128,32 +105,41 @@ const toggleId = `toggle-${prompt.slug}`;
   <textarea id={`${promptId}-text`} class="sr-only" readonly>{prompt.body}</textarea>
 </div>
 
-<script define:vars={{ promptId, copyBtnId, toggleId }}>
-  // Handle expand/collapse functionality
+<!-- Modal for Full Prompt -->
+<PromptModal prompt={prompt} modalId={modalId} />
+
+<script define:vars={{ promptId, modalId, copyBtnId }}>
   document.addEventListener('DOMContentLoaded', () => {
-    const toggleBtn = document.getElementById(toggleId);
-    const promptEl = document.getElementById(promptId);
-    const previewEl = promptEl.querySelector('.prompt-preview');
-    const fullEl = promptEl.querySelector('.prompt-full');
-    const expandText = toggleBtn.querySelector('.expand-text');
-    const collapseText = toggleBtn.querySelector('.collapse-text');
-    const expandIcon = toggleBtn.querySelector('.expand-icon');
-    const collapseIcon = toggleBtn.querySelector('.collapse-icon');
+    const card = document.querySelector(`[data-modal-id="${modalId}"]`);
+    const modal = document.getElementById(modalId);
+    const viewPromptBtn = card.querySelector('.view-prompt-btn');
     
-    toggleBtn.addEventListener('click', () => {
-      previewEl.classList.toggle('hidden');
-      fullEl.classList.toggle('hidden');
-      expandText.classList.toggle('hidden');
-      collapseText.classList.toggle('hidden');
-      expandIcon.classList.toggle('hidden');
-      collapseIcon.classList.toggle('hidden');
+    // Handle click on card or view button to open modal
+    function openModal(e) {
+      // Don't open modal if copy button was clicked
+      if (e.target.closest(`#${copyBtnId}`)) {
+        e.stopPropagation();
+        return;
+      }
+      
+      // Remove the hidden class to show the modal
+      modal.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+    
+    viewPromptBtn.addEventListener('click', e => {
+      e.stopPropagation(); // Prevent double events
+      openModal(e);
     });
+    
+    card.addEventListener('click', openModal);
     
     // Handle copy functionality
     const copyBtn = document.getElementById(copyBtnId);
     const textArea = document.getElementById(`${promptId}-text`);
     
-    copyBtn.addEventListener('click', () => {
+    copyBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent card click event
       textArea.select();
       navigator.clipboard.writeText(textArea.value);
       
@@ -183,5 +169,13 @@ const toggleId = `toggle-${prompt.slug}`;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+  
+  .prompt-card {
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .prompt-card:hover {
+    transform: translateY(-2px);
   }
 </style>
