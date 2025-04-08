@@ -75,7 +75,7 @@ const promptIcon = getIconForPrompt(prompt);
     </div>
     
     <!-- Modal Content -->
-    <div class="p-6 overflow-y-auto flex-grow">
+    <div class="p-6 overflow-y-auto flex-grow markdown-content">
       <div class="prose prose-sm dark:prose-invert max-w-none text-slate-600 dark:text-slate-300">
         <Content />
       </div>
@@ -107,7 +107,6 @@ const promptIcon = getIconForPrompt(prompt);
     const textArea = document.getElementById(copyTextId);
     
     // Make sure modal is hidden initially using the standard class
-    // We're not using our custom class to avoid conflicts with existing code
     if (!modal.classList.contains('hidden')) {
       modal.classList.add('hidden');
     }
@@ -160,8 +159,49 @@ const promptIcon = getIconForPrompt(prompt);
   });
 </script>
 
-<style>
-  /* Keep animation styles local to this component */
+<style is:global>
+  /* Style specific Markdown elements in the modal */
+  #modalId .prose h1 {
+    @apply text-2xl font-bold mt-4 mb-2;
+  }
+  
+  #modalId .prose h2 {
+    @apply text-xl font-bold mt-4 mb-2;
+  }
+  
+  #modalId .prose h3 {
+    @apply text-lg font-bold mt-4 mb-2;
+  }
+  
+  #modalId .prose p {
+    @apply mb-4;
+  }
+  
+  #modalId .prose ul {
+    @apply list-disc pl-5 mb-4;
+  }
+  
+  #modalId .prose ol {
+    @apply list-decimal pl-5 mb-4;
+  }
+  
+  #modalId .prose li {
+    @apply mb-1;
+  }
+  
+  #modalId .prose code {
+    @apply bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded text-sm font-mono;
+  }
+  
+  #modalId .prose pre {
+    @apply bg-slate-800 text-slate-100 p-3 rounded-md text-sm overflow-x-auto my-3;
+  }
+  
+  #modalId .prose pre code {
+    @apply bg-transparent text-slate-100 p-0;
+  }
+  
+  /* Modal animations */
   @keyframes modalFade {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -173,11 +213,11 @@ const promptIcon = getIconForPrompt(prompt);
   }
   
   /* Apply animations when modal is shown */
-  #modalId:not(.hidden) {
+  div[id^="modal-"]:not(.hidden) {
     animation: modalFade 0.2s ease-in-out;
   }
   
-  #modalId:not(.hidden) > div {
+  div[id^="modal-"]:not(.hidden) > div {
     animation: modalSlide 0.2s ease-out;
   }
 </style>

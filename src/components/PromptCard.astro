@@ -78,14 +78,6 @@ const promptPreview = promptText.length > previewLength
         {promptPreview}
       </div>
     </div>
-    
-    <!-- View Full Prompt Button -->
-    <button class="view-prompt-btn mt-4 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center">
-      <span>View full prompt</span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 ml-1">
-        <polyline points="6 9 12 15 18 9"></polyline>
-      </svg>
-    </button>
   </div>
   
   <!-- Card Footer -->
@@ -112,9 +104,8 @@ const promptPreview = promptText.length > previewLength
   document.addEventListener('DOMContentLoaded', () => {
     const card = document.querySelector(`[data-modal-id="${modalId}"]`);
     const modal = document.getElementById(modalId);
-    const viewPromptBtn = card.querySelector('.view-prompt-btn');
     
-    // Handle click on card or view button to open modal
+    // Handle click on card to open modal
     function openModal(e) {
       // Don't open modal if copy button was clicked
       if (e.target.closest(`#${copyBtnId}`)) {
@@ -126,11 +117,6 @@ const promptPreview = promptText.length > previewLength
       modal.classList.remove('hidden');
       document.body.classList.add('overflow-hidden');
     }
-    
-    viewPromptBtn.addEventListener('click', e => {
-      e.stopPropagation(); // Prevent double events
-      openModal(e);
-    });
     
     card.addEventListener('click', openModal);
     
