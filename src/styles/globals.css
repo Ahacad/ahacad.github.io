@@ -133,3 +133,30 @@
 .markdown-content th {
   @apply bg-gray-100 dark:bg-gray-800;
 }
+
+/* Prompt card styles */
+.prompt-card-container {
+  @apply transition-all duration-300;
+}
+
+.prompt-preview code {
+  @apply bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.prompt-full code {
+  @apply bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.prompt-full pre {
+  @apply bg-slate-800 text-slate-100 p-3 rounded-md text-sm overflow-x-auto my-3;
+}
+
+/* Copy button animation */
+.copy-btn-success {
+  @apply bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-300;
+}
+
+/* Transition effects */
+.prompt-card-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
