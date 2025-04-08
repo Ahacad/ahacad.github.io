@@ -133,3 +133,89 @@
 .markdown-content th {
   @apply bg-gray-100 dark:bg-gray-800;
 }
+
+/* Prompt card styles */
+.prompt-card-container {
+  @apply transition-all duration-300;
+}
+
+.prompt-preview code {
+  @apply bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.prompt-full code {
+  @apply bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.prompt-full pre {
+  @apply bg-slate-800 text-slate-100 p-3 rounded-md text-sm overflow-x-auto my-3;
+}
+
+/* Copy button animation */
+.copy-btn-success {
+  @apply bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-300;
+}
+
+/* Transition effects */
+.prompt-card-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+/* Modal styles */
+.prompt-modal {
+  @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+}
+
+/* Modal-specific hidden class */
+.prompt-modal-hidden {
+  display: none !important;
+}
+
+/* Prompt markdown styles - make sure they properly render */
+.prose h1 {
+  @apply text-2xl font-bold mt-6 mb-4;
+}
+
+.prose h2 {
+  @apply text-xl font-bold mt-5 mb-3;
+}
+
+.prose h3 {
+  @apply text-lg font-bold mt-4 mb-2;
+}
+
+.prose p {
+  @apply my-3;
+}
+
+.prose ul, .prose ol {
+  @apply pl-6 my-3;
+}
+
+.prose ul {
+  @apply list-disc;
+}
+
+.prose ol {
+  @apply list-decimal;
+}
+
+.prose li {
+  @apply mb-1;
+}
+
+.prose code {
+  @apply bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded font-mono text-sm;
+}
+
+.prose pre {
+  @apply bg-slate-800 text-slate-100 p-4 rounded-md text-sm overflow-x-auto my-4;
+}
+
+.prose pre code {
+  @apply bg-transparent text-white p-0;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-slate-300 dark:border-slate-600 pl-4 italic my-4;
+}
